@@ -9,5 +9,9 @@
     "atom": ">0.50.0"
   },
   "dependencies": {
+    "q": "1.*"
+  },
+  "devDependencies": {
+    "nock": "0.*"
   }
 }

@@ -1,6 +1,7 @@
 fs = require 'fs'
 https = require 'https'
 path = require 'path'
+q = require 'q'
 
 module.exports =
 class Gist
@@ -21,19 +22,7 @@ class Gist
     @token
 
   post: (data, callback) ->
-    options =
-      hostname: 'api.github.com'
-      path: '/gists'
-      method: 'POST'
-      headers:
-        "User-Agent": "Atom"
-
-    # Use the user's token if we have one
-
-    if @getToken()?
-      options.headers["Authorization"] = "token #{@getToken()}"
-
-    request = https.request options, (res) ->
+    request = https.request @options {method: 'POST'}, (res) ->
       res.setEncoding "utf8"
       body = ''
       res.on "data", (chunk) ->
@@ -52,3 +41,37 @@ class Gist
     files:
       "settings.json":
         content: JSON.stringify data
+
+  options: ({path, method}={}) ->
+    path ?= '/gists'
+    method ?= 'GET'
+
+    options =
+      hostname: 'api.github.com'
+      path: path
+      method: method
+      headers:
+        "User-Agent": "Atom Sync Settings"
+
+    # Use the user's token if we have one
+    if @getToken()?
+      options.headers["Authorization"] = "token #{@getToken()}"
+
+    options
+
+
+  list: (filter={}) ->
+    deferred = Q.defer()
+    request = https.request @options(), (res) ->
+      res.setEncoding "utf8"
+      body = ''
+      res.on "data", (chunk) ->
+        body += chunk
+      res.on "end", ->
+        response = JSON.parse(body)
+        console.log response
+        deferred.resolve response
+
+    request.write(JSON.stringify(@toParams(data)))
+    request.end()
+    deferred.promise
