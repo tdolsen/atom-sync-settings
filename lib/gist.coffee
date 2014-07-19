@@ -61,8 +61,8 @@ class Gist
 
 
   list: (filter={}) ->
-    deferred = Q.defer()
-    request = https.request @options(), (res) ->
+    deferred = q.defer()
+    https.request @options(), (res) ->
       res.setEncoding "utf8"
       body = ''
       res.on "data", (chunk) ->
@@ -71,7 +71,5 @@ class Gist
         response = JSON.parse(body)
         console.log response
         deferred.resolve response
-
-    request.write(JSON.stringify(@toParams(data)))
-    request.end()
+    .end()
     deferred.promise
