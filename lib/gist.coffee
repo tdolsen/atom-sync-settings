@@ -2,6 +2,7 @@ fs = require 'fs'
 https = require 'https'
 path = require 'path'
 q = require 'q'
+request = require 'request'
 
 module.exports =
 class Gist
@@ -62,14 +63,9 @@ class Gist
 
   list: (filter={}) ->
     deferred = q.defer()
-    https.request @options(), (res) ->
-      res.setEncoding "utf8"
-      body = ''
-      res.on "data", (chunk) ->
-        body += chunk
-      res.on "end", ->
-        response = JSON.parse(body)
-        console.log response
-        deferred.resolve response
+    request 'https://api.github.com/gists', (error, response, body) ->
+        console.log error, response, body
+        data = JSON.parse(body)
+        deferred.resolve data
     .end()
     deferred.promise

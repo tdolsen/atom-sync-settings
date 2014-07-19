@@ -9,7 +9,8 @@
     "atom": ">0.50.0"
   },
   "dependencies": {
-    "q": "1.*"
+    "q": "1.*",
+    "request": "2.*"
   },
   "devDependencies": {
     "nock": "0.*"

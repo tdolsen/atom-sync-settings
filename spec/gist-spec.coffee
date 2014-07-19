@@ -14,12 +14,17 @@ describe "SyncSettings", ->
     gist = new Gist()
     github = nock 'https://api.github.com'
 
+  afterEach ->
+    expect(github.isDone()).toBe true
+
   describe "when gist list is asked", ->
     it "calls github", ->
       request = github
       .get '/gists'
       .reply 200, []
 
-      gist.list()
-
-      expect(request.isDone()).toBe true
+      waitsForPromise ->
+        gist
+        .list()
+        .then (data) ->
+          expect(data).toEqual []
