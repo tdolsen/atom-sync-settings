@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "github": "0.*",
-    "emissary": "1.x",
     "q": "~1.0.1",
     "semver": "~2.2.1",
     "underscore-plus": "^1.0.6"

@@ -1,23 +1,40 @@
 # imports
-{BufferedProcess} = require 'atom'
-GitHubApi = require 'github'
 _ = require 'underscore-plus'
-PackageManager = require './package-manager'
 fs = require 'fs'
+GitHubApi = require 'github'
+PackageManager = require './package-manager'
 
 # constants
 DESCRIPTION = 'Atom configuration store operated by http://atom.io/packages/sync-settings'
 REMOVE_KEYS = ["sync-settings"]
 
-module.exports =
-  configDefaults:
-    personalAccessToken: "<Your personal GitHub access token>"
-    gistId: "<Id of gist to use for configuration store>"
+module.exports = new class SyncSettings
+  # Public attributes
+  config:
+    personalAccessToken:
+        type: "string"
+        description: "Your personal GitHub access token"
+        default: ""
+    gistId:
+        type: "string"
+        description: "Id of gist to use for configuration store"
+        default: ""
+    autoUpdateFrequency:
+        default: 10*60*10
+        type: 'number'
+        min: 1000
+        description: "Number of seconds between automatic updates. Default: 10 minutes."
 
   activate: ->
-    # for debug
+
     atom.workspaceView.command "sync-settings:upload", => @upload()
     atom.workspaceView.command "sync-settings:download", => @download()
+
+    @periodicSync()
+
+  periodicSync: ->
+    @upload()
+    setTimeout @periodicSync.bind(this), atom.config.get('sync-settings.autoUpdateFrequency') * 1000
 
   deactivate: ->
 
