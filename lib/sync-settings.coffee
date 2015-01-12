@@ -95,6 +95,9 @@ module.exports = new class SyncSettings
     , (err, res) =>
       if err
         console.error "error while retrieving the gist. does it exists?", err
+        message = JSON.parse(err.message).message
+        message = 'Gist ID Not Found' if message == 'Not Found'
+        atom.notifications.addError "sync-settings: Error retrieving your settings. ("+message+")"
         return
 
       for file, data of res.files
@@ -135,8 +138,4 @@ module.exports = new class SyncSettings
       else
         console.info "updating of package '#{ pkg.name }' was successful"
       cb?(err)
-
-  filterSettings: (key, value) ->
-    return value if key == ""
-    return undefined if ~REMOVE_KEYS.indexOf(key)
-    value
+      atom.notifications.addSuccess "sync-settings: Your settings were successfully synchronized."
