@@ -35,7 +35,7 @@ module.exports = new class SyncSettings
     atom.workspaceView.command "sync-settings:upload", => @upload()
     atom.workspaceView.command "sync-settings:download", => @download()
 
-    @periodicSync()
+    #@periodicSync()
 
   periodicSync: ->
     @upload()
@@ -71,7 +71,7 @@ module.exports = new class SyncSettings
         matches.forEach (file, i) =>
             files[file] = { content: @fileContent file }
 
-        files["packages.cson"] = { content: CSON.stringify(atom.packages.getAvailablePackageMetadata(), null, 2) }
+        files["packages.cson"] = { content: @getPackages }
 
         @createClient().gists.edit
           id: atom.config.get 'sync-settings.gistId'
@@ -107,6 +107,15 @@ module.exports = new class SyncSettings
       atom.config.load
       @syncPackages CSON.parse(res.files["packages.cson"].content)
       cs?(err, res)
+
+  getPackages: () ->
+    packages = atom.packages.getAvailablePackageMetadata().map (pkg) ->
+      p = {name: pkg.name, version: pkg.version}
+      p.theme = pkg.theme if pkg.theme
+      p
+
+    console.log(packages)
+    return CSON.stringify(packages, null, 2)
 
   syncPackages: (packages, cb) ->
     metadata = {}
