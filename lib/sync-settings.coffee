@@ -54,7 +54,7 @@ module.exports =
         matches.forEach (file, i) =>
             files[file] = { content: @fileContent file }
 
-        files["packages.cson"] = { content: CSON.stringify(atom.packages.getAvailablePackageMetadata(), null, 2) }
+        files["packages.cson"] = { content: CSON.stringify(atom.packages.getAvailablePackageMetadata(), ['name', 'version', 'theme'], 2) }
 
         @createClient().gists.edit
           id: atom.config.get 'sync-settings.gistId'
